@@ -1,22 +1,17 @@
 package dao
 
-// import (
-// 	"google.golang.org/grpc"
+import (
+	"google.golang.org/grpc"
 
-// 	. "github.com/SiCo-DevOps/H/log"
-// )
+	. "github.com/SiCo-DevOps/log"
+)
 
-// const (
-// 	address = "127.0.0.1" + ":6666"
-// )
+func RpcConn(bsns string) *grpc.ClientConn {
+	address := bsns + ":6666"
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		LogErrMsg(5, "dao.RpcConn."+bsns)
+	}
 
-// var (
-// 	RpcConn *grpc.ClientConn
-// )
-
-// func init() {
-// 	RpcConn, err = grpc.Dial(address, grpc.WithInsecure())
-// 	if err != nil {
-// 		WriteLog("error", "grpc connect error")
-// 	}
-// }
+	return conn
+}
