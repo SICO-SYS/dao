@@ -15,30 +15,49 @@ import (
 	. "github.com/SiCo-DevOps/log"
 )
 
-type User struct {
-	Id     string "_id"
-	Key    string "key"
-	Secret string "secret"
+type UserKeypair struct {
+	Id     bson.ObjectId "_id"
+	Key    string        "key"
+	Secret string        "secret"
 }
 
 var (
-	MgoConn *mgo.Session
+	MgoConn          *mgo.Session
+	UserKeypairIndex = mgo.Index{
+		Key:        []string{"key"},
+		Unique:     true,
+		DropDups:   true,
+		Background: true,
+	}
 )
 
-func init() {
-	MgoConn, err := mgo.Dial(config.Mongo.User.Addr)
-	if err != nil {
-		LogProduce("error", "Mongo connect failed")
-	}
-	MgoConn.SetPoolLimit(10)
-	defer MgoConn.Close()
-	result := User{}
+// func EnsureIndex(c *mgo.Collection, index mgo.Index) bool {
+// 	err = c.EnsureIndex(index)
+// 	if err != nil {
+// 		LogErrMsg(22, "dao.EnsureIndex")
+// 		return false
+// 	}
+// 	return true
+// }
+
+func (u *UserKeypair) Insert(k string, s string) bool {
+	user := &UserKeypair{bson.NewObjectId(), k, s}
 	c := MgoConn.Clone()
-	s := c.DB("user").C("keypair")
-	// s.EnsureIndex(index)
-	s.Find(bson.M{"key": "123456"}).One(&result)
-	// defer s.Close()
-	c.Close()
-	// c := s.DB("SiCo").C("user")
-	// c.Find("123456")
+	defer c.Close()
+	err = c.DB("SiCo").C("user.keypair").Insert(user)
+	if err != nil {
+		LogErrMsg(21, "dao.UserKeypair.Insert")
+		return false
+	}
+	return true
+}
+
+func init() {
+	MgoConn, err := mgo.Dial(config.Mongo.UserKeypair.Addr)
+	if err != nil {
+		LogErrMsg(2, "dao.init")
+	} else {
+		MgoConn.SetPoolLimit(10)
+	}
+	MgoConn.DB("SiCo").C("user.keypair").EnsureIndex(UserKeypairIndex)
 }
