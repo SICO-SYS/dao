@@ -15,15 +15,9 @@ import (
 	. "github.com/SiCo-DevOps/log"
 )
 
-type UserKeypair struct {
-	Id     bson.ObjectId "_id"
-	Key    string        "key"
-	Secret string        "secret"
-}
-
 var (
-	MgoUserConn, mgoerr = mgo.Dial(config.Mongo.UserKeypair.Addr)
-	UserKeypairIndex    = mgo.Index{
+	MgoUserConn, mgoerr = mgo.Dial(config.Mongo.User.Addr)
+	UserKeyIndex        = mgo.Index{
 		Key:        []string{"key"},
 		Unique:     true,
 		DropDups:   true,
@@ -31,21 +25,24 @@ var (
 	}
 )
 
-func (u *UserKeypair) Insert() bool {
+func Mgo_Insert(v interface{}, c string) bool {
 	defer func() {
 		if recover() != nil {
-			LogErrMsg(2, "dao.mongo.Insert")
+			LogErrMsg(2, "dao.Mgo_Insert")
 		}
 	}()
-	user := &UserKeypair{bson.NewObjectId(), u.Key, u.Secret}
-	c := MgoUserConn.Clone()
-	defer c.Close()
-	err = c.DB("SiCo").C("user.keypair").Insert(user)
+	conn := MgoUserConn.Clone()
+	defer conn.Close()
+	err = conn.DB("SiCo").C(c).Insert(v)
 	if err != nil {
-		LogErrMsg(21, "dao.UserKeypair.Insert")
+		LogErrMsg(21, "dao.Mgo_Insert")
 		return false
 	}
 	return true
+}
+
+func Mgo_Find(k string, s string) map[string]interface{} {
+	return bson.M{k: s}
 }
 
 func init() {
@@ -54,5 +51,6 @@ func init() {
 	} else {
 		MgoUserConn.SetPoolLimit(100)
 	}
-	MgoUserConn.DB("SiCo").C("user.keypair").EnsureIndex(UserKeypairIndex)
+	MgoUserConn.DB("SiCo").C("user.keypair").EnsureIndex(UserKeyIndex)
+	MgoUserConn.DB("SiCo").C("user.auth").EnsureIndex(UserKeyIndex)
 }
