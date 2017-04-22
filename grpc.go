@@ -7,6 +7,7 @@ import (
 )
 
 func RpcConn(bsns string) *grpc.ClientConn {
+	defer func() { recover(); LogErrMsg(50, "dao.RpcConn") }()
 	address := bsns + ":6666"
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {

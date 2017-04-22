@@ -46,6 +46,7 @@ func Mgo_Find(k string, s string) map[string]interface{} {
 }
 
 func init() {
+	defer func() { recover(); LogProduce("error", "Maybe mongo connection failed") }()
 	if mgoerr != nil {
 		LogErrMsg(2, "dao.init")
 	} else {
