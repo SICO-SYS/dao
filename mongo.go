@@ -17,8 +17,14 @@ import (
 
 var (
 	MgoUserConn, mgoerr = mgo.Dial(config.Mongo.User.Addr)
-	UserKeyIndex        = mgo.Index{
-		Key:        []string{"key"},
+	MongoIdIndex        = mgo.Index{
+		Key:        []string{"id"},
+		Unique:     true,
+		DropDups:   true,
+		Background: true,
+	}
+	MongoIDNameIndex = mgo.Index{
+		Key:        []string{"id", "name"},
 		Unique:     true,
 		DropDups:   true,
 		Background: true,
@@ -27,6 +33,7 @@ var (
 
 func Mgo_Insert(v interface{}, c string) bool {
 	defer func() {
+		recover()
 		if recover() != nil {
 			LogErrMsg(2, "dao.Mgo_Insert")
 		}
@@ -45,13 +52,25 @@ func Mgo_Find(k string, s string) map[string]interface{} {
 	return bson.M{k: s}
 }
 
+func AAA_ensureIndexes() {
+	MgoUserConn.DB("SiCo").C("user.keypair").EnsureIndex(MongoIdIndex)
+	MgoUserConn.DB("SiCo").C("user.auth").EnsureIndex(MongoIdIndex)
+	MgoUserConn.DB("SiCo").C("user.cloud.aws").EnsureIndex(MongoIDNameIndex)
+	MgoUserConn.DB("SiCo").C("user.cloud.aliyun").EnsureIndex(MongoIDNameIndex)
+	MgoUserConn.DB("SiCo").C("user.cloud.qcloud").EnsureIndex(MongoIDNameIndex)
+
+}
+
 func init() {
-	defer func() { recover(); LogProduce("error", "Maybe mongo connection failed") }()
+	defer func() {
+		recover()
+		if recover() != nil {
+			LogProduce("error", "Maybe mongo connection failed")
+		}
+	}()
 	if mgoerr != nil {
 		LogErrMsg(2, "dao.init")
 	} else {
 		MgoUserConn.SetPoolLimit(100)
 	}
-	MgoUserConn.DB("SiCo").C("user.keypair").EnsureIndex(UserKeyIndex)
-	MgoUserConn.DB("SiCo").C("user.auth").EnsureIndex(UserKeyIndex)
 }
