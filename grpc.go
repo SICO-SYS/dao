@@ -6,12 +6,16 @@ import (
 	. "github.com/SiCo-DevOps/log"
 )
 
-func RpcConn(bsns string) *grpc.ClientConn {
-	defer func() { recover(); LogErrMsg(50, "dao.RpcConn") }()
-	address := bsns + ":6666"
+func RpcConn(address string) *grpc.ClientConn {
+	defer func() {
+		recover()
+		if recover() != nil {
+			LogErrMsg(50, "dao.RpcConn")
+		}
+	}()
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		LogErrMsg(5, "dao.RpcConn."+bsns)
+		LogErrMsg(5, "dao.RpcConn."+address)
 	}
 
 	return conn

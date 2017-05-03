@@ -31,6 +31,8 @@ var (
 	}
 )
 
+type Mgo_Querys map[string]string
+
 func Mgo_Insert(v interface{}, c string) bool {
 	defer func() {
 		recover()
@@ -50,6 +52,23 @@ func Mgo_Insert(v interface{}, c string) bool {
 
 func Mgo_Find(k string, s string) map[string]interface{} {
 	return bson.M{k: s}
+}
+
+func (m Mgo_Querys) Mgo_FindsOne(c string) bson.M {
+	defer func() {
+		recover()
+		if recover() != nil {
+			LogErrMsg(2, "dao.Mgo_FindsOne")
+		}
+	}()
+	data, _ := bson.Marshal(m)
+	query := bson.M{}
+	bson.Unmarshal(data, query)
+	conn := MgoUserConn.Clone()
+	defer conn.Close()
+	b := bson.M{}
+	conn.DB("SiCo").C(c).Find(query).One(b)
+	return b
 }
 
 func AAA_ensureIndexes() {
