@@ -10,9 +10,7 @@ package mongo
 
 import (
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 
-	"github.com/SiCo-DevOps/cfg"
 	. "github.com/SiCo-DevOps/log"
 )
 
