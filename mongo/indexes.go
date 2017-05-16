@@ -25,6 +25,12 @@ var (
 		DropDups:   true,
 		Background: true,
 	}
+	MongoNameIndex = mgo.Index{
+		Key:        []string{"name"},
+		Unique:     true,
+		DropDups:   true,
+		Background: true,
+	}
 )
 
 func AAA_ensureIndexes() {
@@ -35,8 +41,6 @@ func AAA_ensureIndexes() {
 	MgoUserConn.DB("SiCo").C("user.cloud.qcloud").EnsureIndex(MongoIDNameIndex)
 }
 
-func Cloud_ensureIndexes() {
-	MgoUserConn.DB("SiCo").C("cloud.aws.template").EnsureIndex(MongoIDNameIndex)
-	MgoUserConn.DB("SiCo").C("cloud.aliyun.template").EnsureIndex(MongoIDNameIndex)
-	MgoUserConn.DB("SiCo").C("cloud.qcloud.template").EnsureIndex(MongoIDNameIndex)
+func Asset_ensureIndexes(id string) {
+	MgoAssetConn.DB("SiCo").C("asset.template." + id).EnsureIndex(MongoNameIndex)
 }
