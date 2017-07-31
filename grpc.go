@@ -1,21 +1,20 @@
 package dao
 
 import (
+	"github.com/getsentry/raven-go"
 	"google.golang.org/grpc"
-
-	. "github.com/SiCo-DevOps/log"
 )
 
-func RpcConn(address string) *grpc.ClientConn {
+func RPCConn(address string) *grpc.ClientConn {
 	defer func() {
 		recover()
 		if recover() != nil {
-			LogErrMsg(50, "dao.RpcConn")
+			raven.CaptureMessage("dao.grpc.RPCConn", nil)
 		}
 	}()
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		LogErrMsg(5, "dao.RpcConn."+address)
+		raven.CaptureError(err, nil)
 	}
 
 	return conn

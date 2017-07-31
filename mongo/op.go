@@ -9,40 +9,39 @@ Email:    sinerwr@gmail.com
 package mongo
 
 import (
+	"github.com/getsentry/raven-go"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-
-	. "github.com/SiCo-DevOps/log"
 )
 
-type Mgo_Querys map[string]string
+type MgoQuerys map[string]string
 
-func Mgo_Insert(mgoconn *mgo.Session, v interface{}, c string) bool {
+func MgoInsert(mgoconn *mgo.Session, v interface{}, c string) bool {
 	defer func() {
 		recover()
 		if recover() != nil {
-			LogErrMsg(2, "dao.Mgo_Insert")
+			raven.CaptureMessage("dao.mongo.Mgo_Insert", nil)
 		}
 	}()
 	conn := mgoconn.Clone()
 	defer conn.Close()
 	err := conn.DB("SiCo").C(c).Insert(v)
 	if err != nil {
-		LogErrMsg(21, "dao.Mgo_Insert")
+		raven.CaptureError(err, nil)
 		return false
 	}
 	return true
 }
 
-func Mgo_Find(k string, s string) map[string]interface{} {
+func MgoFind(k string, s string) map[string]interface{} {
 	return bson.M{k: s}
 }
 
-func (m Mgo_Querys) Mgo_FindsOne(mgoconn *mgo.Session, c string) bson.M {
+func (m MgoQuerys) MgoFindOne(mgoconn *mgo.Session, c string) bson.M {
 	defer func() {
 		recover()
 		if recover() != nil {
-			LogErrMsg(2, "dao.Mgo_FindsOne")
+			raven.CaptureMessage("dao.mongo.MgoFindOne", nil)
 		}
 	}()
 	data, _ := bson.Marshal(m)

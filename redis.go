@@ -10,8 +10,7 @@ package dao
 
 import (
 	"github.com/garyburd/redigo/redis"
-
-	. "github.com/SiCo-DevOps/log"
+	"github.com/getsentry/raven-go"
 )
 
 var (
@@ -58,7 +57,7 @@ func init() {
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", config.Redis.Default.Host+":"+config.Redis.Default.Port)
 			if err != nil {
-				LogProduce("error", err.Error())
+				raven.CaptureError(err, nil)
 			}
 			return c, err
 		},
@@ -66,8 +65,6 @@ func init() {
 
 	err = RedisPool.Get().Close()
 	if err != nil {
-		LogProduce("error", "Cannot Open redis connection")
-	} else {
-		LogProduce("info", "Success connect redis")
+		raven.CaptureError(err, nil)
 	}
 }

@@ -42,5 +42,5 @@ func AAA_ensureIndexes() {
 }
 
 func Asset_ensureIndexes(id string) {
-	MgoAssetConn.DB("SiCo").C("asset.template." + id).EnsureIndex(MongoNameIndex)
+	MgoAssetConn.DB("SiCo").C("asset." + id + ".template").EnsureIndex(MongoNameIndex)
 }

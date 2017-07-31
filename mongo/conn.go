@@ -9,9 +9,8 @@ Email:    sinerwr@gmail.com
 package mongo
 
 import (
+	"github.com/getsentry/raven-go"
 	"gopkg.in/mgo.v2"
-
-	. "github.com/SiCo-DevOps/log"
 )
 
 var (
@@ -25,7 +24,7 @@ func init() {
 	defer func() {
 		recover()
 		if recover() != nil {
-			LogProduce("error", "Maybe mongo connection failed")
+			raven.CaptureMessage("dao.mongo.init", nil)
 		}
 	}()
 
