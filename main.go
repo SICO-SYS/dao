@@ -9,7 +9,7 @@ Email:    sinerwr@gmail.com
 package dao
 
 import (
-	"github.com/SiCo-DevOps/cfg"
+	"github.com/SiCo-Ops/cfg"
 )
 
 var (
