@@ -9,28 +9,21 @@ Email:    sinerwr@gmail.com
 package mongo
 
 import (
-	"github.com/getsentry/raven-go"
 	"gopkg.in/mgo.v2"
 )
 
 var (
-	MgoDefaultConn, mgoDefaultErr = mgo.Dial(config.Mongo.Default.Addr)
-	MgoUserConn, mgoUserErr       = mgo.Dial(config.Mongo.User.Addr)
-	MgoCloudConn, mgoCloudErr     = mgo.Dial(config.Mongo.Cloud.Addr)
-	MgoAssetConn, mgoAssetErr     = mgo.Dial(config.Mongo.Asset.Addr)
+	MgoTestingConn, mgoTestingErr = mgo.Dial(config.Mongo.Testing.Address)
+	MgoUserConn, mgoUserErr       = mgo.Dial(config.Mongo.User.Address)
+	MgoCloudConn, mgoCloudErr     = mgo.Dial(config.Mongo.Cloud.Address)
+	MgoAssetConn, mgoAssetErr     = mgo.Dial(config.Mongo.Asset.Address)
 )
 
-func init() {
-	defer func() {
-		recover()
-		if recover() != nil {
-			raven.CaptureMessage("dao.mongo.init", nil)
-		}
-	}()
-
-	MgoDefaultConn.SetPoolLimit(10)
-	MgoUserConn.SetPoolLimit(10)
-	MgoCloudConn.SetPoolLimit(10)
-	MgoAssetConn.SetPoolLimit(10)
-
-}
+// func init() {
+// 	defer func() {
+// 		recover()
+// 		if recover() != nil {
+// 			raven.CaptureMessage("dao.mongo.init", nil)
+// 		}
+// 	}()
+// }

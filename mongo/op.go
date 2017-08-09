@@ -20,7 +20,7 @@ func MgoInsert(mgoconn *mgo.Session, v interface{}, c string) bool {
 	defer func() {
 		recover()
 		if recover() != nil {
-			raven.CaptureMessage("dao.mongo.Mgo_Insert", nil)
+			raven.CaptureMessage("dao.mongo.MgoInsert", nil)
 		}
 	}()
 	conn := mgoconn.Clone()

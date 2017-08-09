@@ -1,4 +1,12 @@
-package dao
+/*
+
+LICENSE:  MIT
+Author:   sine
+Email:    sinerwr@gmail.com
+
+*/
+
+package rpc
 
 import (
 	"github.com/getsentry/raven-go"
