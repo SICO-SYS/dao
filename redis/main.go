@@ -18,7 +18,7 @@ import (
 var (
 	config = cfg.Config
 
-	OpenAccessPool *redis.Pool
+	PublicPool *redis.Pool
 )
 
 func RedisSetWithExpire(r *redis.Pool, key string, value interface{}, time int16) error {
@@ -57,17 +57,17 @@ func RedisValueIsString(v interface{}) (string, error) {
 }
 
 func init() {
-	OpenAccessPool = &redis.Pool{
+	PublicPool = &redis.Pool{
 		MaxIdle:   80,
 		MaxActive: 2000,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", config.Redis.OpenAccess.Host+":"+config.Redis.OpenAccess.Port)
+			c, err := redis.Dial("tcp", config.Redis.Public.Host+":"+config.Redis.Public.Port)
 			if err != nil {
 				raven.CaptureError(err, nil)
 				return c, err
 			}
-			if config.Redis.OpenAccess.Auth != "" {
-				_, err := c.Do("AUTH", config.Redis.OpenAccess.Auth)
+			if config.Redis.Public.Auth != "" {
+				_, err := c.Do("AUTH", config.Redis.Public.Auth)
 				if err != nil {
 					raven.CaptureError(err, nil)
 					c.Close()
