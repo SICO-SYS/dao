@@ -21,7 +21,7 @@ var (
 	PublicPool *redis.Pool
 )
 
-func RedisSetWithExpire(r *redis.Pool, key string, value interface{}, time int16) error {
+func SetWithExpire(r *redis.Pool, key string, value interface{}, time int16) error {
 	conn := r.Get()
 	err := conn.Err()
 	defer conn.Close()
@@ -30,7 +30,7 @@ func RedisSetWithExpire(r *redis.Pool, key string, value interface{}, time int16
 	return err
 }
 
-func RedisSetWithUnexpire(r *redis.Pool, key string, value interface{}) error {
+func SetWithUnexpire(r *redis.Pool, key string, value interface{}) error {
 	conn := r.Get()
 	err := conn.Err()
 	defer conn.Close()
@@ -38,7 +38,7 @@ func RedisSetWithUnexpire(r *redis.Pool, key string, value interface{}) error {
 	return err
 }
 
-func RedisGetWithKey(r *redis.Pool, key string) (interface{}, error, error) {
+func GetWithKey(r *redis.Pool, key string) (interface{}, error, error) {
 	conn := r.Get()
 	err := conn.Err()
 	defer conn.Close()
@@ -46,12 +46,12 @@ func RedisGetWithKey(r *redis.Pool, key string) (interface{}, error, error) {
 	return data, err, err2
 }
 
-func RedisValueIsBool(v interface{}) (bool, error) {
+func ValueIsBool(v interface{}) (bool, error) {
 	var err error
 	return redis.Bool(v, err)
 }
 
-func RedisValueIsString(v interface{}) (string, error) {
+func ValueIsString(v interface{}) (string, error) {
 	var err error
 	return redis.String(v, err)
 }
