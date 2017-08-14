@@ -34,13 +34,17 @@ var (
 )
 
 func AAAEnsureIndexes() {
-	MgoUserConn.DB("SiCo").C("user.keypair").EnsureIndex(MongoIdIndex)
-	MgoUserConn.DB("SiCo").C("user.auth").EnsureIndex(MongoIdIndex)
-	MgoUserConn.DB("SiCo").C("user.cloud.aws").EnsureIndex(MongoIDNameIndex)
-	MgoUserConn.DB("SiCo").C("user.cloud.aliyun").EnsureIndex(MongoIDNameIndex)
-	MgoUserConn.DB("SiCo").C("user.cloud.qcloud").EnsureIndex(MongoIDNameIndex)
+	MgoUserConn.DB("SiCo").C("user.token").EnsureIndex(MongoIdIndex)
+	MgoUserConn.DB("SiCo").C("user.policy").EnsureIndex(MongoIdIndex)
 }
 
-func AssetEnsureIndexes(id string) {
-	MgoAssetConn.DB("SiCo").C("asset." + id + ".template").EnsureIndex(MongoNameIndex)
+func CloudEnsureIndexes() {
+	MgoCloudConn.DB("SiCo").C("cloud.token.aws").EnsureIndex(MongoIDNameIndex)
+	MgoCloudConn.DB("SiCo").C("cloud.token.aliyun").EnsureIndex(MongoIDNameIndex)
+	MgoCloudConn.DB("SiCo").C("cloud.token.qcloud").EnsureIndex(MongoIDNameIndex)
+
+}
+
+func AssetEnsureIndexes(id string, cloud string) {
+	MgoAssetConn.DB("SiCo").C("template." + id).EnsureIndex(MongoNameIndex)
 }
