@@ -45,6 +45,7 @@ func CloudEnsureIndexes() {
 
 }
 
-func AssetEnsureIndexes(id string, cloud string) {
+func AssetEnsureIndexes(id string) {
+	// MgoAssetConn.DB("SiCo").C("asset." + id + "." + cloud).EnsureIndex(MongoIdIndex)
 	MgoAssetConn.DB("SiCo").C("template." + id).EnsureIndex(MongoNameIndex)
 }
