@@ -38,12 +38,29 @@ func SetWithUnexpire(r *redis.Pool, key string, value interface{}) error {
 	return err
 }
 
-func GetWithKey(r *redis.Pool, key string) (interface{}, error, error) {
+func GetWithKey(r *redis.Pool, key string) (interface{}, error) {
 	conn := r.Get()
 	err := conn.Err()
 	defer conn.Close()
-	data, err2 := conn.Do("GET", key)
-	return data, err, err2
+	if err != nil {
+		return "", err
+	}
+	data, err := conn.Do("GET", key)
+	return data, err
+}
+
+func ExpiredAfterGetWithKey(r *redis.Pool, key string) (interface{}, error) {
+	conn := r.Get()
+	err := conn.Err()
+	defer conn.Close()
+	if err != nil {
+		return "", err
+	}
+	data, err := conn.Do("GET", key)
+	if err == nil {
+		conn.Do("DEL", key)
+	}
+	return data, err
 }
 
 func ValueIsBool(v interface{}) (bool, error) {
