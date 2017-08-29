@@ -25,7 +25,7 @@ func MgoInsert(mgoconn *mgo.Session, v interface{}, c string) bool {
 	}()
 	conn := mgoconn.Clone()
 	defer conn.Close()
-	err := conn.DB("SiCo").C(c).Insert(v)
+	err := conn.DB(databaseName()).C(c).Insert(v)
 	if err != nil {
 		raven.CaptureError(err, nil)
 		return false
@@ -47,9 +47,9 @@ func (m MgoQuerys) MgoFindOne(mgoconn *mgo.Session, c string) bson.M {
 	data, _ := bson.Marshal(m)
 	query := bson.M{}
 	bson.Unmarshal(data, query)
-	conn := mgoconn.Clone()
+	conn := mgoconn
 	defer conn.Close()
 	b := bson.M{}
-	conn.DB("SiCo").C(c).Find(query).One(b)
+	conn.DB(databaseName()).C(c).Find(query).One(b)
 	return b
 }
