@@ -34,22 +34,42 @@ var (
 )
 
 func AAAEnsureIndexes() {
-	UserConn.DB(databaseName()).C(CollectionUserTokenName()).EnsureIndex(IdIndex)
-	UserConn.DB(databaseName()).C(CollectionUserPolicyName()).EnsureIndex(IdIndex)
+	defer func() {
+		recover()
+	}()
+	conn := UserConn.Clone()
+	defer conn.Close()
+	conn.DB(databaseName()).C(CollectionUserTokenName()).EnsureIndex(IdIndex)
+	conn.DB(databaseName()).C(CollectionUserPolicyName()).EnsureIndex(IdIndex)
 }
 
 func CloudEnsureIndexes() {
-	CloudConn.DB(databaseName()).C(CollectionCloudTokenName("aws")).EnsureIndex(IDNameIndex)
-	CloudConn.DB(databaseName()).C(CollectionCloudTokenName("aliyun")).EnsureIndex(IDNameIndex)
-	CloudConn.DB(databaseName()).C(CollectionCloudTokenName("qcloud")).EnsureIndex(IDNameIndex)
+	defer func() {
+		recover()
+	}()
+	conn := CloudConn.Clone()
+	defer conn.Close()
+	conn.DB(databaseName()).C(CollectionCloudTokenName("aws")).EnsureIndex(IDNameIndex)
+	conn.DB(databaseName()).C(CollectionCloudTokenName("aliyun")).EnsureIndex(IDNameIndex)
+	conn.DB(databaseName()).C(CollectionCloudTokenName("qcloud")).EnsureIndex(IDNameIndex)
 
 }
 
 func TemplateEnsureIndexes(id string) {
-	AssetConn.DB(databaseName()).C(CollectionTemplateName(id)).EnsureIndex(NameIndex)
+	defer func() {
+		recover()
+	}()
+	conn := AssetConn.Clone()
+	defer conn.Close()
+	conn.DB(databaseName()).C(CollectionTemplateName(id)).EnsureIndex(NameIndex)
 }
 
 func AssetEnsureIndexes(cloud, id string) {
-	AssetConn.DB(databaseName()).C(CollectionAssetCloudName(cloud, id)).EnsureIndex(NameIndex)
+	defer func() {
+		recover()
+	}()
+	conn := AssetConn.Clone()
+	defer conn.Close()
+	conn.DB(databaseName()).C(CollectionAssetCloudName(cloud, id)).EnsureIndex(NameIndex)
 
 }
