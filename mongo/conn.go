@@ -17,8 +17,8 @@ func databaseName() string {
 }
 
 var (
-	MgoTestingConn, mgoTestingErr = mgo.Dial(config.Mongo.Testing.Address)
-	MgoUserConn, mgoUserErr       = mgo.Dial(config.Mongo.User.Address)
-	MgoCloudConn, mgoCloudErr     = mgo.Dial(config.Mongo.Cloud.Address)
-	MgoAssetConn, mgoAssetErr     = mgo.Dial(config.Mongo.Asset.Address)
+	TestingConn, TestingErr = mgo.Dial(config.Mongo.Testing.Address)
+	UserConn, UserErr       = mgo.Dial(config.Mongo.User.Address)
+	CloudConn, CloudErr     = mgo.Dial(config.Mongo.Cloud.Address)
+	AssetConn, AssetErr     = mgo.Dial(config.Mongo.Asset.Address)
 )

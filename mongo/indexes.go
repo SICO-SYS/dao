@@ -13,19 +13,19 @@ import (
 )
 
 var (
-	MongoIdIndex = mgo.Index{
+	IdIndex = mgo.Index{
 		Key:        []string{"id"},
 		Unique:     true,
 		DropDups:   true,
 		Background: true,
 	}
-	MongoIDNameIndex = mgo.Index{
+	IDNameIndex = mgo.Index{
 		Key:        []string{"id", "name"},
 		Unique:     true,
 		DropDups:   true,
 		Background: true,
 	}
-	MongoNameIndex = mgo.Index{
+	NameIndex = mgo.Index{
 		Key:        []string{"name"},
 		Unique:     true,
 		DropDups:   true,
@@ -34,22 +34,22 @@ var (
 )
 
 func AAAEnsureIndexes() {
-	MgoUserConn.DB(databaseName()).C(CollectionUserTokenName()).EnsureIndex(MongoIdIndex)
-	MgoUserConn.DB(databaseName()).C(CollectionUserPolicyName()).EnsureIndex(MongoIdIndex)
+	UserConn.DB(databaseName()).C(CollectionUserTokenName()).EnsureIndex(IdIndex)
+	UserConn.DB(databaseName()).C(CollectionUserPolicyName()).EnsureIndex(IdIndex)
 }
 
 func CloudEnsureIndexes() {
-	MgoCloudConn.DB(databaseName()).C(CollectionCloudTokenName("aws")).EnsureIndex(MongoIDNameIndex)
-	MgoCloudConn.DB(databaseName()).C(CollectionCloudTokenName("aliyun")).EnsureIndex(MongoIDNameIndex)
-	MgoCloudConn.DB(databaseName()).C(CollectionCloudTokenName("qcloud")).EnsureIndex(MongoIDNameIndex)
+	CloudConn.DB(databaseName()).C(CollectionCloudTokenName("aws")).EnsureIndex(IDNameIndex)
+	CloudConn.DB(databaseName()).C(CollectionCloudTokenName("aliyun")).EnsureIndex(IDNameIndex)
+	CloudConn.DB(databaseName()).C(CollectionCloudTokenName("qcloud")).EnsureIndex(IDNameIndex)
 
 }
 
 func TemplateEnsureIndexes(id string) {
-	MgoAssetConn.DB(databaseName()).C(CollectionTemplateName(id)).EnsureIndex(MongoNameIndex)
+	AssetConn.DB(databaseName()).C(CollectionTemplateName(id)).EnsureIndex(NameIndex)
 }
 
 func AssetEnsureIndexes(cloud, id string) {
-	MgoAssetConn.DB(databaseName()).C(CollectionAssetCloudName(cloud, id)).EnsureIndex(MongoNameIndex)
+	AssetConn.DB(databaseName()).C(CollectionAssetCloudName(cloud, id)).EnsureIndex(NameIndex)
 
 }

@@ -14,14 +14,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type MgoQuerys map[string]string
+type Querys map[string]string
 
-func MgoInsert(mgoconn *mgo.Session, v interface{}, c string) bool {
+func Insert(mgoconn *mgo.Session, v interface{}, c string) bool {
 	defer func() {
 		recover()
-		if recover() != nil {
-			raven.CaptureMessage("dao.mongo.MgoInsert", nil)
-		}
 	}()
 	conn := mgoconn.Clone()
 	defer conn.Close()
@@ -33,23 +30,34 @@ func MgoInsert(mgoconn *mgo.Session, v interface{}, c string) bool {
 	return true
 }
 
-func MgoFind(k string, s string) map[string]interface{} {
+func Find(k string, s string) map[string]interface{} {
 	return bson.M{k: s}
 }
 
-func (m MgoQuerys) MgoFindOne(mgoconn *mgo.Session, c string) bson.M {
+func (m Querys) FindOne(mgoconn *mgo.Session, c string) bson.M {
 	defer func() {
 		recover()
-		if recover() != nil {
-			raven.CaptureMessage("dao.mongo.MgoFindOne", nil)
-		}
 	}()
 	data, _ := bson.Marshal(m)
 	query := bson.M{}
 	bson.Unmarshal(data, query)
-	conn := mgoconn
+	conn := mgoconn.Clone()
 	defer conn.Close()
 	b := bson.M{}
 	conn.DB(databaseName()).C(c).Find(query).One(b)
 	return b
+}
+
+func Remove(mgoconn *mgo.Session, c string) bool {
+	defer func() {
+		recover()
+	}()
+	conn := mgoconn.Clone()
+	defer conn.Close()
+	err := conn.DB(databaseName()).C(c).Remove(bson.M{})
+	if err != nil {
+		raven.CaptureError(err, nil)
+		return false
+	}
+	return true
 }
