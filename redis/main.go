@@ -10,15 +10,6 @@ package redis
 
 import (
 	"github.com/garyburd/redigo/redis"
-	"github.com/getsentry/raven-go"
-
-	"github.com/SiCo-Ops/cfg"
-)
-
-var (
-	config = cfg.Config
-
-	PublicPool *redis.Pool
 )
 
 func SetWithExpire(r *redis.Pool, key string, value interface{}, time int16) error {
@@ -36,6 +27,25 @@ func SetWithUnexpire(r *redis.Pool, key string, value interface{}) error {
 	defer conn.Close()
 	conn.Do("SET", key, value)
 	return err
+}
+
+func Hmset(r *redis.Pool, key string, value interface{}) error {
+	conn := r.Get()
+	err := conn.Err()
+	defer conn.Close()
+	conn.Do("HMSET", redis.Args{}.Add(key).AddFlat(value)...)
+	return err
+}
+
+func Hgetall(r *redis.Pool, key string) (map[string]string, error) {
+	conn := r.Get()
+	err := conn.Err()
+	defer conn.Close()
+	data, err := conn.Do("HGETALL", key)
+	if err != nil {
+		return nil, err
+	}
+	return redis.StringMap(data, nil)
 }
 
 func GetWithKey(r *redis.Pool, key string) (interface{}, error) {
@@ -71,28 +81,4 @@ func ValueIsBool(v interface{}) (bool, error) {
 func ValueIsString(v interface{}) (string, error) {
 	var err error
 	return redis.String(v, err)
-}
-
-func init() {
-	PublicPool = &redis.Pool{
-		MaxIdle:   80,
-		MaxActive: 2000,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", config.Redis.Public.Host+":"+config.Redis.Public.Port)
-			if err != nil {
-				raven.CaptureError(err, nil)
-				return c, err
-			}
-			if config.Redis.Public.Auth != "" {
-				_, err := c.Do("AUTH", config.Redis.Public.Auth)
-				if err != nil {
-					raven.CaptureError(err, nil)
-					c.Close()
-					return nil, err
-				}
-			}
-			return c, err
-
-		},
-	}
 }

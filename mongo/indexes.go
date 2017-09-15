@@ -33,21 +33,21 @@ var (
 	}
 )
 
-func AAAEnsureIndexes() {
+func AAAEnsureIndexes(m *mgo.Session) {
 	defer func() {
 		recover()
 	}()
-	conn := UserConn.Clone()
+	conn := m.Clone()
 	defer conn.Close()
 	conn.DB(databaseName()).C(CollectionUserTokenName()).EnsureIndex(IdIndex)
 	conn.DB(databaseName()).C(CollectionUserPolicyName()).EnsureIndex(IdIndex)
 }
 
-func CloudEnsureIndexes() {
+func CloudEnsureIndexes(m *mgo.Session) {
 	defer func() {
 		recover()
 	}()
-	conn := CloudConn.Clone()
+	conn := m.Clone()
 	defer conn.Close()
 	conn.DB(databaseName()).C(CollectionCloudTokenName("aws")).EnsureIndex(IDNameIndex)
 	conn.DB(databaseName()).C(CollectionCloudTokenName("aliyun")).EnsureIndex(IDNameIndex)
@@ -55,20 +55,20 @@ func CloudEnsureIndexes() {
 
 }
 
-func TemplateEnsureIndexes(id string) {
+func TemplateEnsureIndexes(m *mgo.Session, id string) {
 	defer func() {
 		recover()
 	}()
-	conn := AssetConn.Clone()
+	conn := m.Clone()
 	defer conn.Close()
 	conn.DB(databaseName()).C(CollectionTemplateName(id)).EnsureIndex(NameIndex)
 }
 
-func AssetEnsureIndexes(cloud, id string) {
+func AssetEnsureIndexes(m *mgo.Session, cloud, id string) {
 	defer func() {
 		recover()
 	}()
-	conn := AssetConn.Clone()
+	conn := m.Clone()
 	defer conn.Close()
 	conn.DB(databaseName()).C(CollectionAssetCloudName(cloud, id)).EnsureIndex(NameIndex)
 
