@@ -12,7 +12,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-func SetWithExpire(r *redis.Pool, key string, value interface{}, time int16) error {
+func SetWithExpire(r *redis.Pool, key string, value interface{}, time int) error {
 	conn := r.Get()
 	err := conn.Err()
 	defer conn.Close()
