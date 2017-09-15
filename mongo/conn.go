@@ -16,6 +16,6 @@ func databaseName() string {
 	return "SiCo"
 }
 
-func Dial(address, username, password) *mgo.Session {
+func Dial(address, username, password string) (*mgo.Session, error) {
 	return mgo.Dial(address)
 }
