@@ -48,6 +48,13 @@ func (m Querys) FindOne(mgoconn *mgo.Session, c string) bson.M {
 	return b
 }
 
+func FindOne(mgoconn *mgo.Session, q Querys) (m map[string]interface{}) {
+	conn := mgoconn.Clone()
+	defer conn.Close()
+	conn.DB("SiCo").C("user.token").Find(q).One(&m)
+	return m
+}
+
 func Remove(mgoconn *mgo.Session, c string) bool {
 	defer func() {
 		recover()

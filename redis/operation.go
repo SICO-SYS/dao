@@ -33,7 +33,10 @@ func Hmset(r *redis.Pool, key string, value interface{}) error {
 	conn := r.Get()
 	err := conn.Err()
 	defer conn.Close()
-	conn.Do("HMSET", redis.Args{}.Add(key).AddFlat(value)...)
+	_, operr := conn.Do("HMSET", redis.Args{}.Add(key).AddFlat(value)...)
+	if operr != nil {
+		return operr
+	}
 	return err
 }
 
