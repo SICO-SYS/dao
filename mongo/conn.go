@@ -16,7 +16,11 @@ func databaseName() string {
 	return "SiCo"
 }
 
-func Dial(address, username, password string) (*mgo.Session, error) {
+func NewDial() (*mgo.Session, error) {
+	return &mgo.Session{}, nil
+}
+
+func InitDial(address, username, password string) (*mgo.Session, error) {
 	if username != "" && password != "" {
 		return mgo.Dial(username + ":" + password + "@" + address)
 	}

@@ -12,37 +12,60 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-func SetWithExpire(r *redis.Pool, key string, value interface{}, time int) error {
+func Set(r *redis.Pool, key string, value interface{}, time int64) error {
 	conn := r.Get()
 	err := conn.Err()
+	if err != nil {
+		return err
+	}
 	defer conn.Close()
-	conn.Do("SET", key, value)
-	conn.Do("EXPIRE", key, time)
-	return err
+	_, err = conn.Do("SET", key, value)
+	if err != nil {
+		return err
+	}
+	if time != 0 {
+		_, err = conn.Do("EXPIRE", key, time)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func SetWithUnexpire(r *redis.Pool, key string, value interface{}) error {
+func Get(r *redis.Pool, key string) (interface{}, error) {
 	conn := r.Get()
 	err := conn.Err()
+	if err != nil {
+		return nil, err
+	}
 	defer conn.Close()
-	conn.Do("SET", key, value)
-	return err
+	data, err := conn.Do("GET", key)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func Hmset(r *redis.Pool, key string, value interface{}) error {
 	conn := r.Get()
 	err := conn.Err()
-	defer conn.Close()
-	_, operr := conn.Do("HMSET", redis.Args{}.Add(key).AddFlat(value)...)
-	if operr != nil {
-		return operr
+	if err != nil {
+		return err
 	}
-	return err
+	defer conn.Close()
+	_, err = conn.Do("HMSET", redis.Args{}.Add(key).AddFlat(value)...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func Hgetall(r *redis.Pool, key string) (map[string]string, error) {
 	conn := r.Get()
 	err := conn.Err()
+	if err != nil {
+		return nil, err
+	}
 	defer conn.Close()
 	data, err := conn.Do("HGETALL", key)
 	if err != nil {
@@ -51,29 +74,22 @@ func Hgetall(r *redis.Pool, key string) (map[string]string, error) {
 	return redis.StringMap(data, nil)
 }
 
-func GetWithKey(r *redis.Pool, key string) (interface{}, error) {
+func ExpiredAfterGet(r *redis.Pool, key string) (interface{}, error) {
 	conn := r.Get()
 	err := conn.Err()
-	defer conn.Close()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	data, err := conn.Do("GET", key)
-	return data, err
-}
-
-func ExpiredAfterGetWithKey(r *redis.Pool, key string) (interface{}, error) {
-	conn := r.Get()
-	err := conn.Err()
 	defer conn.Close()
-	if err != nil {
-		return "", err
-	}
 	data, err := conn.Do("GET", key)
-	if err == nil {
-		conn.Do("DEL", key)
+	if err != nil {
+		return nil, err
 	}
-	return data, err
+	_, err = conn.Do("DEL", key)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func ValueIsBool(v interface{}) (bool, error) {

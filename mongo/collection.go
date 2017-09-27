@@ -10,7 +10,6 @@ package mongo
 
 func CollectionUserTokenName() string {
 	return "user.token"
-
 }
 
 func CollectionUserPolicyName() string {

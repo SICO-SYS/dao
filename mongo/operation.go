@@ -9,62 +9,46 @@ Email:    sinerwr@gmail.com
 package mongo
 
 import (
-	"github.com/getsentry/raven-go"
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type Querys map[string]string
 
-func Insert(mgoconn *mgo.Session, v interface{}, c string) bool {
-	defer func() {
-		recover()
-	}()
+func Insert(mgoconn *mgo.Session, c string, v interface{}) (err error) {
 	conn := mgoconn.Clone()
-	defer conn.Close()
-	err := conn.DB(databaseName()).C(c).Insert(v)
+	err = mgoconn.Ping()
 	if err != nil {
-		raven.CaptureError(err, nil)
-		return false
+		return err
 	}
-	return true
-}
-
-func Find(k string, s string) map[string]interface{} {
-	return bson.M{k: s}
-}
-
-func (m Querys) FindOne(mgoconn *mgo.Session, c string) bson.M {
-	defer func() {
-		recover()
-	}()
-	data, _ := bson.Marshal(m)
-	query := bson.M{}
-	bson.Unmarshal(data, query)
-	conn := mgoconn.Clone()
 	defer conn.Close()
-	b := bson.M{}
-	conn.DB(databaseName()).C(c).Find(query).One(b)
-	return b
+	err = conn.DB(databaseName()).C(c).Insert(v)
+	return err
 }
 
-func FindOne(mgoconn *mgo.Session, q Querys) (m map[string]interface{}) {
+func FindOne(mgoconn *mgo.Session, c string, q map[string]string) (m map[string]interface{}, err error) {
 	conn := mgoconn.Clone()
-	defer conn.Close()
-	conn.DB("SiCo").C("user.token").Find(q).One(&m)
-	return m
-}
-
-func Remove(mgoconn *mgo.Session, c string) bool {
-	defer func() {
-		recover()
-	}()
-	conn := mgoconn.Clone()
-	defer conn.Close()
-	err := conn.DB(databaseName()).C(c).Remove(bson.M{})
+	err = mgoconn.Ping()
 	if err != nil {
-		raven.CaptureError(err, nil)
-		return false
+		return nil, err
 	}
-	return true
+	defer conn.Close()
+	err = conn.DB(databaseName()).C(c).Find(q).One(&m)
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func Remove(mgoconn *mgo.Session, c string, q map[string]string) (err error) {
+	conn := mgoconn.Clone()
+	err = mgoconn.Ping()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	err = conn.DB(databaseName()).C(c).Remove(q)
+	if err != nil {
+		return err
+	}
+	return nil
 }
