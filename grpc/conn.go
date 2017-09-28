@@ -13,17 +13,24 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Deprecated After 1.0.0
 func RPCConn(address string) *grpc.ClientConn {
 	defer func() {
 		recover()
-		if recover() != nil {
-			raven.CaptureMessage("dao.grpc.RPCConn", nil)
-		}
 	}()
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address)
 	if err != nil {
 		raven.CaptureError(err, nil)
 	}
 
 	return conn
+}
+
+func Conn(host, port string) (*grpc.ClientConn, error) {
+	if port == "" {
+		port = "6666"
+	}
+	address := host + ":" + port
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	return conn, err
 }
