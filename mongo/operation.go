@@ -34,7 +34,7 @@ func FindOne(mgoconn *mgo.Session, c string, q map[string]string) (m map[string]
 	defer conn.Close()
 	err = conn.DB(databaseName()).C(c).Find(q).One(&m)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	return m, nil
 }
