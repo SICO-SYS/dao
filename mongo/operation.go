@@ -39,6 +39,20 @@ func FindOne(mgoconn *mgo.Session, c string, q map[string]string) (m map[string]
 	return m, nil
 }
 
+func FindAll(mgoconn *mgo.Session, c string, q map[string]string) (m []map[string]interface{}, err error) {
+	conn := mgoconn.Clone()
+	err = mgoconn.Ping()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	err = conn.DB(databaseName()).C(c).Find(q).All(&m)
+	if err != nil {
+		return nil, nil
+	}
+	return m, nil
+}
+
 func Remove(mgoconn *mgo.Session, c string, q map[string]string) (err error) {
 	conn := mgoconn.Clone()
 	err = mgoconn.Ping()

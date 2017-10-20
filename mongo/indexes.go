@@ -100,3 +100,21 @@ func AssetEnsureIndexes(m *mgo.Session, cloud, id string) (err error) {
 	}
 	return nil
 }
+
+func HookEnsureIndexes(m *mgo.Session) (err error) {
+	conn := m.Clone()
+	err = m.Ping()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	err = conn.DB(databaseName()).C(CollectionHookName()).EnsureIndex(IdIndex)
+	if err != nil {
+		return err
+	}
+	err = conn.DB(databaseName()).C(CollectionHookName()).EnsureIndex(NameIndex)
+	if err != nil {
+		return err
+	}
+	return nil
+}
